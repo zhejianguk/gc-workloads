@@ -10,24 +10,20 @@ void* thread_boom(void* args){
 	pthread_t thread_id = pthread_self();
 	pid_t pid;
 	cpu_set_t cpu_id;
-	unsigned long hart_id;
-	unsigned long satp;
 	int s;
-	
-	// asm volatile ("csrr %0, mhartid"  : "=r"(hart_id));
-	asm volatile ("csrr %0, satp"  : "=r"(satp));
+
 
 	CPU_ZERO(&cpu_id);
 	CPU_SET(0, &cpu_id); 
 	s = pthread_setaffinity_np(thread_id, sizeof(cpu_id), &cpu_id);
 	if (s != 0) {
-		printf ("Boom[HartID: %x]: pthread_setaffinity failed.", hart_id);
+		printf ("[Boom]: pthread_setaffinity failed.");
 	} else { 	
-		printf ("Boom[HartID: %x]: Bounded Thread ID: %x to CPU: 0. \r\n", hart_id, thread_id);
+		printf ("[Boom]: Bounded Thread ID: %x to CPU: 0. \r\n", thread_id);
 	}
 
 	pid = gettid ();
-	printf ("Boom[HartID: %x]: Hello world, from Thread ID: %x; PID: %d; satp: %x. \r\n", hart_id, thread_id, pid, satp);
+	printf ("[Boom]: Hello world, from Thread ID: %x; PID: %d. \r\n", thread_id, pid);
 	while(1) {
 
 	}
@@ -38,24 +34,19 @@ void* thread_checker(void* args){
 	pthread_t thread_id = pthread_self();
 	pid_t pid;
 	cpu_set_t cpu_id;
-	unsigned long hart_id;
-	unsigned long satp;
-	int s;
-	
-	// asm volatile ("csrr %0, mhartid"  : "=r"(hart_id));
-	asm volatile ("csrr %0, satp"  : "=r"(satp));
+	int s;	
 
 	CPU_ZERO(&cpu_id);
-	CPU_SET(0, &cpu_id); 
+	CPU_SET(3, &cpu_id); 
 	s = pthread_setaffinity_np(thread_id, sizeof(cpu_id), &cpu_id);
 	if (s != 0) {
-		printf ("Rocket[HartID: %x]: pthread_setaffinity failed.", hart_id);
-	} else { 	
-		printf ("Rocket[HartID: %x]: Bounded Thread ID: %x to CPU: 0. \r\n", hart_id, thread_id);
+		printf ("[Rocket]: pthread_setaffinity failed.");
+	} else {
+		printf ("[Rocket]: Bounded Thread ID: %x to CPU: 3. \r\n", thread_id);
 	}
 
 	pid = gettid ();
-	printf ("Rocket[HartID: %x]: Hello world, from Thread ID: %x; PID: %d; satp: %x. \r\n", hart_id, thread_id, pid, satp);
+	printf ("[Rocket]: Hello world, from Thread ID: %x; PID: %d. \r\n", thread_id, pid);
 	while(1) {
 
 	}
