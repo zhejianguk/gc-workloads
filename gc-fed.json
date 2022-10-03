@@ -1,6 +1,5 @@
 {
   "name" : "gc-fed",
-  "mem"  : "8GiB",
   "base" : "fedora-base.json",
   "overlay" : "overlay",
   "host-init" : "host-init.sh",
@@ -10,13 +9,11 @@
       "name" : "helloworld",
       "outputs" : [ "/root/run_result.csv" ],
       "run" : "run-workload.sh -s helloworld",
-      "mem"  : "4GiB"
     },
     {
       "name" : "helloworld_pthread",
       "outputs" : [ "/root/run_result.csv" ],
       "run" : "run-workload.sh -s helloworld_pthread",
-      "mem"  : "4GiB"
     }
   ]
 }
