@@ -5,6 +5,10 @@
 #include <unistd.h>
 #include <sys/syscall.h>
 #define gettid() syscall(SYS_gettid)
+#include "spin_lock.h"
+#include "ght.h"
+
+int uart_lock;
 
 void* thread_boom(void* args){
 	pthread_t thread_id = pthread_self();
@@ -12,6 +16,11 @@ void* thread_boom(void* args){
 	cpu_set_t cpu_id;
 	int s;
 
+	uint64_t satp = 0;
+	uint64_t priv = 0;
+
+  	int sum_temp = 0;
+  	int sum = 0;
 
 	CPU_ZERO(&cpu_id);
 	CPU_SET(0, &cpu_id); 
@@ -24,6 +33,19 @@ void* thread_boom(void* args){
 
 	pid = gettid ();
 	printf ("[Boom]: Hello world, from Thread ID: %x; PID: %d. \r\n", thread_id, pid);
+
+	lock_acquire(&uart_lock);
+  	printf("[Boom]: Test is now started: \r\n");
+  	lock_release(&uart_lock);
+  	ght_set_status (0x01); // ght: start
+
+	satp = ght_get_satp();
+  	priv = ght_get_priv();
+  	lock_acquire(&uart_lock);
+  	printf("[Boom]: PTBR = %x; PRIV= %x \r\n", satp, priv);
+  	lock_release(&uart_lock);
+	
+	
 	while(1) {
 
 	}
