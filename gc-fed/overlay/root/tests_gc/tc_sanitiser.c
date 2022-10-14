@@ -10,6 +10,8 @@
 #include "libraries/ghe.h"
 #include "malloc.h"
 
+char* shadow;
+int uart_lock;
 int if_tasks_initalised[NUM_CORES] = {0};
 
 void* thread_boom(void* args){
@@ -32,15 +34,14 @@ void* thread_boom(void* args){
 	}
 
 	// shadow memory
-  	// shadow = shadow_malloc(32*1024*1024*sizeof(char));
-	/*
+	shadow = shadow_malloc(32*1024*1024*sizeof(char));
   	if(shadow == NULL) {
     	printf("C0: Error! memory not allocated.");
     	exit(0);
   	} else {
 		printf("allocated!");
 	}
-	*/
+
 
 	/*
 	// Insepct load operations 
@@ -101,7 +102,7 @@ void* thread_boom(void* args){
 	printf("[Boom-%x]: All tests are done! Status: %x; Sum: %x -- addr: %x \r\n", hart_id, status, sum, &sum);
 	
 	// shadow memory
-	// shadow_free(shadow);
+	shadow_free(shadow);
 	return NULL;
 }
 

@@ -1473,8 +1473,8 @@ static pthread_mutex_t mALLOC_MUTEx = PTHREAD_MUTEX_INITIALIZER;
 #include "libraries/ght.h"
 #include "libraries/spin_lock.h"
 
-char* shadow;
-int uart_lock;
+extern char* shadow;
+extern int uart_lock;
 
 int debug = 0;
 
