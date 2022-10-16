@@ -60,6 +60,7 @@ static inline uint64_t ghe_checkght_status ()
 {
   uint64_t status;
   ROCC_INSTRUCTION_D (1, status, 0x07);
+  status = status & 0x03;
   return status; 
 }
 

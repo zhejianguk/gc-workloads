@@ -33,17 +33,6 @@ void* thread_boom(void* args){
 	while (or_gate(if_tasks_initalised, NUM_CORES) == 0){
 	}
 
-	// shadow memory
-	shadow = shadow_malloc(32*1024*1024*sizeof(char));
-  	if(shadow == NULL) {
-    	printf("C0: Error! memory not allocated.");
-    	exit(0);
-  	} else {
-		printf("allocated!");
-	}
-
-
-	/*
 	// Insepct load operations 
 	// index: 0x01 
 	// Func: 0x00; 0x01; 0x02; 0x03; 0x04; 0x05
@@ -51,7 +40,7 @@ void* thread_boom(void* args){
 	// Data path: MemCaluc
 	ght_cfg_filter(0x01, 0x00, 0x03, 0x02); // lb
 	ght_cfg_filter(0x01, 0x01, 0x03, 0x02); // lh
-	ght_cfg_filter(0x01, 0x02, 0x03, 0x02); // lw
+	ght_cfg_filter(0x01, 0x02, 0x03, 0x02); // lw 
 	ght_cfg_filter(0x01, 0x03, 0x03, 0x02); // ld
 	ght_cfg_filter(0x01, 0x04, 0x03, 0x02); // lbu
 	ght_cfg_filter(0x01, 0x05, 0x03, 0x02); // lhu
@@ -78,26 +67,25 @@ void* thread_boom(void* args){
 	lock_acquire(&uart_lock);
 	printf("[Boom-%x]: Test is now started: \r\n", hart_id);
 	lock_release(&uart_lock);
+	ght_set_status (0x04); // ght: record PTBR
 	ght_set_status (0x01); // start monitoring
-	*/
 	//===================== Execution =====================//
 	printf("Hello Guardian-Council !! \r\n");
 
 	int sum_temp = 0;
 	int sum = 0;
 	for (int i = 0; i < 170; i++ ){
-    	// sum_temp = task_synthetic_malloc(i);
+    	sum_temp = task_synthetic_malloc(i);
     	sum = sum + sum_temp;
     	printf("");
 	}
 
 	//=================== Post execution ===================//
 	uint64_t status;
-	/*
+
 	ght_set_status (0x02);
 	while (((status = ght_get_status()) < 0x1FFFF) || (ght_get_buffer_status() != GHT_EMPTY)){
 	}
-	*/
 
 	printf("[Boom-%x]: All tests are done! Status: %x; Sum: %x -- addr: %x \r\n", hart_id, status, sum, &sum);
 	
@@ -118,7 +106,7 @@ void* thread_sanitiser(void* args){
 	uint64_t Address = 0x0;
   	uint64_t Err_Cnt = 0x0;
 	
-	/*
+
 	//================== Initialisation ==================//
 	CPU_ZERO(&cpu_id);
 	CPU_SET(hart_id, &cpu_id); 
@@ -167,12 +155,11 @@ void* thread_sanitiser(void* args){
 		}
 		ghe_go();
 		}
-		
-	}*/
+	}
 
 	//=================== Post execution ===================//
 	printf("Rocket-C%x-Sani]: Completed, %x illegal accesses are detected.\r\n", hart_id, Err_Cnt);
-	// ghe_release();      
+	ghe_release();
 	
 	return 0;
 }
@@ -180,17 +167,23 @@ void* thread_sanitiser(void* args){
 int main(){
 	pthread_t threads[NUM_CORES];
 
+	// shadow memory
+	shadow = shadow_malloc(32*1024*1024*sizeof(char));
+  	if(shadow == NULL) {
+    	printf("[Boom]: Error! memory not allocated.");
+    	exit(0);
+  	} 
+
+
 	pthread_create(&threads[0], NULL, thread_boom, (void *) 0);	
 
-	/*
+
 	for (uint64_t i = 1; i < NUM_CORES; i++) {
 		pthread_create(&threads[i], NULL, thread_sanitiser, (void *) i);
 	}
 	
-	for (uint64_t i = 1; i < NUM_CORES; i++) {
+	for (uint64_t i = 0; i < NUM_CORES; i++) {
 		pthread_join(threads[i], NULL);
 	}
-	*/
-	pthread_join(threads[0], NULL);
 	return 0;
 }

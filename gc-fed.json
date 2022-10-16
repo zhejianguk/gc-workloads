@@ -19,7 +19,11 @@
       "name" : "tc_pmc",
       "outputs" : [ "/root/run_result.csv" ],
       "run" : "run-workload.sh -s tc_pmc",
+    },
+    {
+      "name" : "tc_sanitiser",
+      "outputs" : [ "/root/run_result.csv" ],
+      "run" : "run-workload.sh -s tc_sanitiser",
     }
-    
   ]
 }

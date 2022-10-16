@@ -1479,16 +1479,12 @@ extern int uart_lock;
 int debug = 0;
 
 void poison(void* start, size_t bytes) {
-
-/*
   ght_set_status (0x00); // ght: pause
   while ((ght_get_status() < 0xFFFF) || (ght_get_buffer_status() != GHT_EMPTY)) {
     //drain_checkers();
   }
-*/  
 
-  // asm volatile("fence rw, rw;");
-
+  asm volatile("fence rw, rw;");
   long start_index = (long)start >> 7;
   long end_index = (long)(start+bytes) >> 7;
 
@@ -1537,20 +1533,19 @@ void poison(void* start, size_t bytes) {
       printf ("poisoned idx and val:  %x - %x\r\n", start_index, shadow[start_index], (~((MASK<<(end_bit+1)) | (MASK>>(8-start_bit)))));
     }
   }
-  // asm volatile("fence rw, rw;");
+  asm volatile("fence rw, rw;");
 
-  // ght_set_status (0x01);
+  ght_set_status (0x01);
 }
 
 
 void unpoison(void* start, size_t bytes) {
-  /*
   ght_set_status (0x00); // ght: pause
   while ((ght_get_status() < 0xFFFF) || (ght_get_buffer_status() != GHT_EMPTY)){
     //drain_checkers();
   }
-  */
-  // asm volatile("fence rw, rw;");
+
+  asm volatile("fence rw, rw;");
 
   long start_index = (long)start >> 7;
   long end_index = (long)(start+bytes) >> 7;
@@ -1602,10 +1597,9 @@ void unpoison(void* start, size_t bytes) {
       lock_release(&uart_lock);
     }
   }
-  // asm volatile("fence rw, rw;");
-  /*
+  asm volatile("fence rw, rw;");
+
   ght_set_status (0x01);
-  */
 }
 
 Void_t* shadow_mALLOc(size_t bytes) {

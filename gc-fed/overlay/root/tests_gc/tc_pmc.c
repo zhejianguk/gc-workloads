@@ -46,14 +46,15 @@ void* thread_boom(void* args){
 	// se: 00, end_id: 0x03, scheduling: rr, start_id: 0x01
 	// se: 01, end_id: 0x07, scheduling: rr, start_id: 0x06
   	ght_cfg_se (0x00, 0x03, 0x01, 0x01);
-  	ght_cfg_se (0x01, 0x07, 0x01, 0x06);
+  	ght_cfg_se (0x01, 0x05, 0x01, 0x04);
 	
 	ght_cfg_mapper (0x01, 0b0011);
-	ghm_cfg_agg(0x04);
+	ghm_cfg_agg(0x07);
 
 	lock_acquire(&uart_lock);
 	printf("[Boom-%x]: Test is now started: \r\n", hart_id);
 	lock_release(&uart_lock);
+	ght_set_status (0x04); // ght: mark PTBR
 	ght_set_status (0x01); // ght: start
 
 	//===================== Execution =====================//
@@ -142,7 +143,7 @@ int main(){
 		pthread_create(&threads[i], NULL, thread_pmc, (void *) i);
 	}
 	
-	for (uint64_t i = 1; i < NUM_CORES; i++) {
+	for (uint64_t i = 0; i < NUM_CORES; i++) {
 		pthread_join(threads[i], NULL);
 	}
 
