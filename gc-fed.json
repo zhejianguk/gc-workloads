@@ -1,6 +1,6 @@
 {
   "name" : "gc-fed",
-  "base" : "fedora-base.json",
+  "base" : "br-base.json",
   "overlay" : "overlay",
   "host-init" : "host-init.sh",
   "guest-init" : "guest-init.sh",

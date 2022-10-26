@@ -5,6 +5,29 @@
 #define GHE_EMPTY 0x01
 
 
+static inline uint64_t debug_icounter ()
+{
+  uint64_t icounter;
+  ROCC_INSTRUCTION_D (1, icounter, 0x1a);
+  return icounter;
+}
+
+static inline uint64_t debug_gcounter ()
+{
+  uint64_t icounter;
+  ROCC_INSTRUCTION_D (1, icounter, 0x23);
+  return icounter;
+}
+
+static inline uint64_t debug_mcounter ()
+{
+  uint64_t mcounter;
+  ROCC_INSTRUCTION_D (1, mcounter, 0x19);
+  return mcounter;
+}
+
+
+
 static inline uint64_t ghe_status ()
 {
   uint64_t status;
@@ -116,12 +139,23 @@ static inline uint64_t ghe_sch_status ()
   // 0b11: error
 }
 
-static inline int or_gate (int *arr, int size) {
-	int rslt;
-
-	for (int i; i < size; i++){
-		rslt = rslt | arr[i];
+static inline int and_gate (int *arr, int size) {
+  asm volatile("fence rw, rw;");
+	int rslt = 1;
+	for (int i = 0; i < size; i++){
+		rslt = rslt & arr[i];
 	}
-
 	return rslt;
 }
+
+int gc_pthread_setaffinity(uint64_t phart_id){
+	pthread_t thread_id = pthread_self();
+	cpu_set_t cpu_id;
+	int s;
+
+	CPU_ZERO(&cpu_id);
+	CPU_SET(phart_id, &cpu_id); 
+	s = pthread_setaffinity_np(thread_id, sizeof(cpu_id), &cpu_id);
+	
+	return s;
+} 

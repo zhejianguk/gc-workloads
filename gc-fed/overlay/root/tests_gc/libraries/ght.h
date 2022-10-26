@@ -4,10 +4,39 @@
 
 #define TRUE 0x01
 #define FALSE 0x00
-#define NUM_CORES 8
+#define NUM_CORES 4
 
 #define GHT_FULL 0x02
 #define GHT_EMPTY 0x01
+
+static inline uint64_t remapping_hart_id (uint64_t hart_id)
+{
+  uint64_t process_id;
+  switch(hart_id) {
+	case 0:
+    process_id = 1;
+    break;
+	case 1:
+    process_id = 2;
+    break;
+	case 2:
+    process_id = 0;
+    break;
+	default:
+    process_id = hart_id;
+		break;
+  }
+
+  return process_id;
+}
+
+
+static inline uint64_t debug_ecounter ()
+{
+  uint64_t ecounter;
+  ROCC_INSTRUCTION_D (1, ecounter, 0x22);
+  return ecounter;
+}
 
 static inline void ght_set_status (uint64_t status)
 {
@@ -37,7 +66,15 @@ static inline uint64_t ght_get_priv ()
   return get_priv;
 }
 
+static inline void ght_set_satp_priv ()
+ {
+   ROCC_INSTRUCTION_S (1, 0x01, 0x16);
+ }
 
+ static inline void ght_unset_satp_priv ()
+ {
+   ROCC_INSTRUCTION_S (1, 0x02, 0x16);
+ }
 
 static inline uint64_t ght_get_buffer_status ()
 {
@@ -107,3 +144,4 @@ uint64_t task_synthetic_malloc (uint64_t base)
 
   return sum;
 }
+

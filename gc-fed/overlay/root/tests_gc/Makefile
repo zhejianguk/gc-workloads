@@ -15,6 +15,9 @@ tc_pmc: tc_pmc.c
 tc_sanitiser: tc_sanitiser.c
 	${CC} ${CFLAGS} -o tc_sanitiser.riscv tc_sanitiser.c malloc.so -lpthread
 
+tc_shadowstack-s: tc_shadowstack-s.c
+	${CC} ${CFLAGS} -o tc_shadowstack-s.riscv tc_shadowstack-s.c -lpthread
+
 clean:
 	rm -f *.o *.riscv *.so
 

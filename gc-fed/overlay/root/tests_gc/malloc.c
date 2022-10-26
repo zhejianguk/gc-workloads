@@ -1479,10 +1479,12 @@ extern int uart_lock;
 int debug = 0;
 
 void poison(void* start, size_t bytes) {
+  /*
   ght_set_status (0x00); // ght: pause
   while ((ght_get_status() < 0xFFFF) || (ght_get_buffer_status() != GHT_EMPTY)) {
     //drain_checkers();
   }
+  */
 
   asm volatile("fence rw, rw;");
   long start_index = (long)start >> 7;
@@ -1535,15 +1537,17 @@ void poison(void* start, size_t bytes) {
   }
   asm volatile("fence rw, rw;");
 
-  ght_set_status (0x01);
+  // ght_set_status (0x01);
 }
 
 
 void unpoison(void* start, size_t bytes) {
+  /*
   ght_set_status (0x00); // ght: pause
   while ((ght_get_status() < 0xFFFF) || (ght_get_buffer_status() != GHT_EMPTY)){
     //drain_checkers();
   }
+  */
 
   asm volatile("fence rw, rw;");
 
@@ -1599,7 +1603,7 @@ void unpoison(void* start, size_t bytes) {
   }
   asm volatile("fence rw, rw;");
 
-  ght_set_status (0x01);
+  // ght_set_status (0x01);
 }
 
 Void_t* shadow_mALLOc(size_t bytes) {

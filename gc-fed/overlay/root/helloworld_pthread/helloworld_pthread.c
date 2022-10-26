@@ -23,7 +23,7 @@ void* thread_boom(void* args){
   	int sum = 0;
 
 	CPU_ZERO(&cpu_id);
-	CPU_SET(0, &cpu_id); 
+	CPU_SET(remapping_hart_id(0), &cpu_id); 
 	s = pthread_setaffinity_np(thread_id, sizeof(cpu_id), &cpu_id);
 	if (s != 0) {
 		printf ("[Boom]: pthread_setaffinity failed.");
@@ -37,7 +37,9 @@ void* thread_boom(void* args){
 	lock_acquire(&uart_lock);
   	printf("[Boom]: Test is now started: \r\n");
   	lock_release(&uart_lock);
+	ght_set_satp_priv ();
   	ght_set_status (0x01); // ght: start
+	
 
 	satp = ght_get_satp();
   	priv = ght_get_priv();
@@ -59,7 +61,7 @@ void* thread_checker(void* args){
 	int s;	
 
 	CPU_ZERO(&cpu_id);
-	CPU_SET(3, &cpu_id); 
+	CPU_SET(remapping_hart_id(3), &cpu_id); 
 	s = pthread_setaffinity_np(thread_id, sizeof(cpu_id), &cpu_id);
 	if (s != 0) {
 		printf ("[Rocket]: pthread_setaffinity failed.");

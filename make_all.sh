@@ -15,4 +15,5 @@ make clean
 make malloc
 make tc_pmc
 make tc_sanitiser
+make tc_shadowstack-s
 cd ..
