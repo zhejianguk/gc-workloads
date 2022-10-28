@@ -83,7 +83,6 @@ static inline uint64_t ghe_checkght_status ()
 {
   uint64_t status;
   ROCC_INSTRUCTION_D (1, status, 0x07);
-  status = status & 0x03;
   return status; 
 }
 
@@ -137,15 +136,6 @@ static inline uint64_t ghe_sch_status ()
   // 0b10: full;
   // 0b00: data buffered;
   // 0b11: error
-}
-
-static inline int and_gate (int *arr, int size) {
-  asm volatile("fence rw, rw;");
-	int rslt = 1;
-	for (int i = 0; i < size; i++){
-		rslt = rslt & arr[i];
-	}
-	return rslt;
 }
 
 int gc_pthread_setaffinity(uint64_t phart_id){

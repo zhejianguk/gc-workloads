@@ -8,22 +8,22 @@
     {
       "name" : "helloworld",
       "outputs" : [ "/root/run_result.csv" ],
-      "run" : "run-workload.sh -s helloworld",
+      "run" : "run-workload.sh -s helloworld"
     },
     {
       "name" : "helloworld_pthread",
       "outputs" : [ "/root/run_result.csv" ],
-      "run" : "run-workload.sh -s helloworld_pthread",
+      "run" : "run-workload.sh -s helloworld_pthread"
     },
     {
       "name" : "tc_pmc",
       "outputs" : [ "/root/run_result.csv" ],
-      "run" : "run-workload.sh -s tc_pmc",
+      "run" : "run-workload.sh -s tc_pmc"
     },
     {
       "name" : "tc_sanitiser",
       "outputs" : [ "/root/run_result.csv" ],
-      "run" : "run-workload.sh -s tc_sanitiser",
+      "run" : "run-workload.sh -s tc_sanitiser"
     }
   ]
 }

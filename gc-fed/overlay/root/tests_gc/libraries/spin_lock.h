@@ -25,3 +25,20 @@ void lock_release (int *lock)
 	);
 }
 
+static inline int and_gate (int *arr, int size) {
+  asm volatile("fence rw, rw;");
+	int rslt = 1;
+	for (int i = 0; i < size; i++){
+		rslt = rslt & arr[i];
+	}
+	return rslt;
+}
+
+static inline int or_gate (int *arr, int size) {
+  asm volatile("fence rw, rw;");
+	int rslt = 0;
+	for (int i = 0; i < size; i++){
+		rslt = rslt | arr[i];
+	}
+	return rslt;
+}

@@ -4,7 +4,7 @@
 
 #define TRUE 0x01
 #define FALSE 0x00
-#define NUM_CORES 4
+#define NUM_CORES 8
 
 #define GHT_FULL 0x02
 #define GHT_EMPTY 0x01
@@ -40,9 +40,7 @@ static inline uint64_t debug_ecounter ()
 
 static inline void ght_set_status (uint64_t status)
 {
-  asm volatile("fence rw, rw;");
   ROCC_INSTRUCTION_SS (1, status, 0X01, 0x06);
-  asm volatile("fence rw, rw;");
 }
 
 static inline uint64_t ght_get_status ()
@@ -121,9 +119,9 @@ uint64_t task_synthetic_malloc (uint64_t base)
   int *ptr = NULL;
   int ptr_size = 32;
   int sum = 0;
-
+    
   ptr = (int*) malloc(ptr_size * sizeof(int));
- 
+
   // if memory cannot be allocated
   if(ptr == NULL) {
     printf("Error! memory not allocated. \r\n");
