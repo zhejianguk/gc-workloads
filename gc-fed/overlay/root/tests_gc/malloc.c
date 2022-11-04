@@ -3901,11 +3901,11 @@ void fREe(mem) Void_t* mem;
       munmap((char*)p - offset, size + offset);
 #endif
     }
-    // printf("chunksize is: %x\r\n", chunksize);
+    printf("chunksize is: %x\r\n", chunksize);
     if (((long) m) & 0xf == 0x10) {
-      poison((long*)m,chunksize-0x11);
+      // poison((long*)m,chunksize-0x11);
     } else {
-      poison((long*)m,chunksize-0x11);
+      // poison((long*)m,chunksize-0x11);
     }
   }
 }

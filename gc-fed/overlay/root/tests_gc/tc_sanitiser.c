@@ -9,10 +9,12 @@
 #include "libraries/ght.h"
 #include "libraries/ghe.h"
 #include "malloc.h"
+#include "sys/mman.h"
 
 char* shadow;
 int uart_lock;
 int if_tasks_initalised[NUM_CORES] = {0};
+int global_counter;
 
 void* thread_boom(void* args){
 	uint64_t hart_id = (uint64_t) args;
@@ -57,8 +59,8 @@ void* thread_boom(void* args){
 	ght_cfg_filter(0x02, 0x03, 0x23, 0x03); // sd
 
 	// se: 01, end_id: 0x02, scheduling: rr, start_id: 0x01
-	// ght_cfg_se (0x01, 0x06, 0x01, 0x01);
-	// ght_cfg_mapper (0x02, 0b0010);
+	ght_cfg_se (0x01, 0x06, 0x01, 0x01);
+	ght_cfg_mapper (0x02, 0b0010);
 
 
 	lock_acquire(&uart_lock);
@@ -67,11 +69,12 @@ void* thread_boom(void* args){
 
 	ght_set_status (0x01); // ght: start
 	//===================== Execution =====================//
-	int sum_temp = 0;
-	int sum = 0;
-	for (int i = 0; i < 170000; i++ ){
+	uint64_t sum_temp = 0;
+	uint64_t sum = 0;
+	for (uint64_t i = 0; i < 170000; i++ ){
     	sum_temp = task_synthetic_malloc(i);
     	sum = sum + sum_temp;
+		global_counter = i;
 	}
 
 	//=================== Post execution ===================//
@@ -82,7 +85,7 @@ void* thread_boom(void* args){
 	}
 
 	lock_acquire(&uart_lock);
-	printf("[Boom-%x]: All tests are done! Status: %x; Sum: %x. \r\n", hart_id, status, sum);
+	printf("[Boom-%x]: All tests are done! Status: %llx; Sum: %llx. \r\n", hart_id, status, sum);
 	lock_release(&uart_lock);
 	
 	ght_unset_satp_priv ();
@@ -107,7 +110,7 @@ void* thread_sanitiser(void* args){
 
 	if (gc_pthread_setaffinity(proc_id) != 0){
 		lock_acquire(&uart_lock);
-		printf ("[Boom-C%x]: pthread_setaffinity failed.", hart_id);
+		printf ("[Rocket-C%x]: pthread_setaffinity failed.", hart_id);
 		lock_release(&uart_lock);
 	} else{
 		ghe_go();
@@ -137,7 +140,7 @@ void* thread_sanitiser(void* args){
 
 		if(bits & (1<<((Address&0x70)>>4))) {
 			lock_acquire(&uart_lock);
-			printf("[Rocket-C%x-Sani]: **Error** illegal accesses at %x, PC: %x, Inst: %x. \r\n", hart_id, Address, PC, Inst);
+			printf("[Rocket-C%x-Sani]: **Error** illegal accesses at %llx, PC: %x, Inst: %x. Global counter: %d. \r\n", hart_id, Address, PC, Inst, global_counter);
 			lock_release(&uart_lock);
 			Err_Cnt ++;
 			// return -1;
@@ -155,7 +158,7 @@ void* thread_sanitiser(void* args){
 	}
 	//=================== Post execution ===================//
 	lock_acquire(&uart_lock);
-	printf("Rocket-C%x-Sani]: Completed, %d illegal accesses are detected.\r\n", hart_id, Err_Cnt);
+	printf("Rocket-C%x-Sani]: Completed, %d illegal accesses are detected. \r\n", hart_id, Err_Cnt);
 	lock_release(&uart_lock);
 
 	ghe_release();
@@ -171,8 +174,15 @@ void* thread_sanitiser(void* args){
 int main(){
 	pthread_t threads[NUM_CORES];
 
+	uint64_t map_size = (long long) 4*1024*1024*1024*sizeof(char);
+
 	// shadow memory
-	shadow = shadow_malloc(32*1024*1024*sizeof(char));
+	shadow = mmap(NULL,
+				map_size,
+				PROT_WRITE | PROT_READ,
+				MAP_PRIVATE | MAP_ANON | MAP_NORESERVE,
+				-1, 0);
+
 	if(shadow == NULL) {
 		lock_acquire(&uart_lock);
 		printf("[Boom]: Error! memory not allocated.");
@@ -191,6 +201,5 @@ int main(){
 		pthread_join(threads[i], NULL);
 	}
 
-	shadow_free(shadow);
 	return 0;
 }

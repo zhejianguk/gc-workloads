@@ -116,11 +116,12 @@ void idle()
 
 uint64_t task_synthetic_malloc (uint64_t base)
 {
-  int *ptr = NULL;
-  int ptr_size = 32;
-  int sum = 0;
+  uint64_t *ptr = NULL;
+  uint64_t ptr_size = 32;
+  uint64_t sum = 0;
     
-  ptr = (int*) malloc(ptr_size * sizeof(int));
+  ptr = (uint64_t*) malloc(ptr_size * sizeof(uint64_t));
+
 
   // if memory cannot be allocated
   if(ptr == NULL) {
@@ -128,12 +129,12 @@ uint64_t task_synthetic_malloc (uint64_t base)
     exit(0);
   }
 
-  for (int i = 0; i < ptr_size; i++)
+  for (uint64_t i = 0; i < ptr_size; i++)
   {
     *(ptr + i) = base + i;
   }
 
-  for (int i = 0; i < ptr_size; i++)
+  for (uint64_t i = 0; i < ptr_size; i++)
   {
     sum = sum + *(ptr+i);
   }
