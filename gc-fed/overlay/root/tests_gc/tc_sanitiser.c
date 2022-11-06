@@ -35,7 +35,6 @@ void* thread_boom(void* args){
 	}
 
 	ghm_cfg_agg(0x07);
-
 	// Insepct load operations 
 	// index: 0x01 
 	// Func: 0x00; 0x01; 0x02; 0x03; 0x04; 0x05
@@ -144,8 +143,8 @@ void* thread_sanitiser(void* args){
 			lock_release(&uart_lock);
 			Err_Cnt ++;
 			// return -1;
+			}
 		}
-	}
 
 		// Dedicated for shadowstack 
 		if (ghe_checkght_status() == 0x04) {

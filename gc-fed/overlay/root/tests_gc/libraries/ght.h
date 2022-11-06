@@ -40,7 +40,9 @@ static inline uint64_t debug_ecounter ()
 
 static inline void ght_set_status (uint64_t status)
 {
+  asm volatile("fence rw, rw;");
   ROCC_INSTRUCTION_SS (1, status, 0X01, 0x06);
+  asm volatile("fence rw, rw;");
 }
 
 static inline uint64_t ght_get_status ()
@@ -132,6 +134,7 @@ uint64_t task_synthetic_malloc (uint64_t base)
   for (uint64_t i = 0; i < ptr_size; i++)
   {
     *(ptr + i) = base + i;
+    *(ptr + i) = *(ptr + i) + *(ptr + ptr_size - i - 1);
   }
 
   for (uint64_t i = 0; i < ptr_size; i++)
