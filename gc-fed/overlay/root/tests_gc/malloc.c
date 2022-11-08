@@ -1541,7 +1541,7 @@ void poison(void* start, size_t bytes) {
     
     asm volatile("fence rw, rw;");
 
-  ght_set_status (0x01);
+    ght_set_status (0x01);
   }
 }
 
@@ -3901,11 +3901,7 @@ void fREe(mem) Void_t* mem;
       munmap((char*)p - offset, size + offset);
 #endif
     }
-    if (((long) m) & 0xf == 0x10) {
-      // poison((long*)m,chunksize-0x11);
-    } else {
-      // poison((long*)m,chunksize-0x11);
-    }
+    poison((long*)m,chunksize-0x11);
   }
 }
 

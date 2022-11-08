@@ -188,6 +188,7 @@ int main(){
 		lock_release(&uart_lock);
 		exit(0);
 	} 
+	asm volatile("fence rw, rw;");
 	
 	pthread_create(&threads[0], NULL, thread_boom, (void *) 0);	
 
