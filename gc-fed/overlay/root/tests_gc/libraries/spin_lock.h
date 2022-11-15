@@ -42,3 +42,18 @@ static inline int or_gate (int *arr, int size) {
 	}
 	return rslt;
 }
+
+static inline int or_gate_checkercores (int *arr, int size) {
+  	asm volatile("fence rw, rw;");
+	
+  	int rslt = 0;
+  	for (int i = 0; i < size - 1; i++){
+		if (i != 1){
+			// 1 is the big core.
+			rslt = rslt | arr[i];
+		} else {
+			rslt = rslt;
+		}
+	}
+	return rslt;
+}

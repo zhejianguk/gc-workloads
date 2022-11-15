@@ -11,10 +11,10 @@
 #include "libraries/deque.h"
 #define GC_Debug 0 
 
-char* shadow;
 int uart_lock;
 int if_tasks_initalised[NUM_CORES] = {0};
 int global_counter;
+int agg_core_id = 0x07;
 
 void* thread_boom(void* args){
 	uint64_t hart_id = (uint64_t) args;
@@ -34,7 +34,7 @@ void* thread_boom(void* args){
 	while (and_gate(if_tasks_initalised, NUM_CORES) == 0){
 	}
 
-	ghm_cfg_agg(0x07);
+	ghm_cfg_agg(agg_core_id);
 	// Insepct JAL 
 	// inst_index: 0x03 
 	// Func: 0x00 - 0x07
@@ -70,12 +70,18 @@ void* thread_boom(void* args){
 	// Data path: ALU + JALR
 	ght_cfg_filter(0x03, 0x01, 0x02, 0x01);
 
+	ght_cfg_se (0x00, 0x00, 0x01, 0x00);
+	ght_cfg_se (0x01, 0x00, 0x01, 0x00);
+	ght_cfg_se (0x02, 0x00, 0x01, 0x00);
 	// se: 0x03, end_id: 0x01, scheduling: rr, start_id: 0x01
 	ght_cfg_se (0x03, 0x01, 0x01, 0x01);
 
+
+	
+	ght_cfg_mapper (0x01, 0b0000);
+	ght_cfg_mapper (0x02, 0b0000);
 	// inst_index: 0x03 se: 0x03
 	ght_cfg_mapper (0x03, 0b1000);
-
 
 	lock_acquire(&uart_lock);
 	printf("[Boom-%x]: Test is now started: \r\n", hart_id);
@@ -101,12 +107,8 @@ void* thread_boom(void* args){
 	lock_acquire(&uart_lock);
 	printf("[Boom-%x]: All tests are done! Status: %llx; Sum: %llx. \r\n", hart_id, status, sum);
 	lock_release(&uart_lock);
-
 	ght_unset_satp_priv ();
 	ght_set_status (0x00);
-	if_tasks_initalised[proc_id] = 0;
-	while (or_gate(if_tasks_initalised, NUM_CORES) == 1){
-	}
 
 	return NULL;
 }
@@ -210,10 +212,17 @@ void* thread_shadowstack_s(void* args){
  	
 	ghe_release();
 
-	if_tasks_initalised[proc_id] = 0;
-	while (or_gate(if_tasks_initalised, NUM_CORES) == 1){
+	// This should not be required -- but we add it for unhandled inst
+	while (ghe_status() != GHE_EMPTY){
+		ROCC_INSTRUCTION (1, 0x0D);
 	}
-
+	
+	if (hart_id == agg_core_id) {
+		for (int i = 0; i< NUM_CORES - 1; i++){
+			ROCC_INSTRUCTION_S(1, 0x01 << (i-1), 0x21);
+		}
+	} 
+	
 	return NULL;
 }
 

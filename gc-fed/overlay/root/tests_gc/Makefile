@@ -21,6 +21,9 @@ tc_sanitiser: tc_sanitiser.c
 tc_shadowstack-s: tc_shadowstack-s.c
 	${CC} ${CFLAGS} -o tc_shadowstack-s.riscv tc_shadowstack-s.c -lpthread
 
+tc_shadowstack-m: tc_shadowstack-m.c
+	${CC} ${CFLAGS} -o tc_shadowstack-m.riscv tc_shadowstack-m.c -lpthread
+
 clean:
 	rm -f *.o *.riscv *.so
 
