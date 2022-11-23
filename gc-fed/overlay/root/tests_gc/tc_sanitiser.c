@@ -88,13 +88,14 @@ void* thread_boom(void* args){
 	while (((status = ght_get_status()) < 0x1FFFF) || (ght_get_buffer_status() != GHT_EMPTY)){
 	}
 
+	if_tasks_initalised[proc_id] = 0;
+	ght_unset_satp_priv ();
+	ght_set_status (0x00);
+	
 	lock_acquire(&uart_lock);
 	printf("[Boom-%x]: All tests are done! Status: %llx; Sum: %llx. \r\n", hart_id, status, sum);
 	lock_release(&uart_lock);
 	
-	ght_unset_satp_priv ();
-	ght_set_status (0x00);
-	if_tasks_initalised[proc_id] = 0;
 	while (or_gate(if_tasks_initalised, NUM_CORES) == 1){
 	}
 
@@ -161,13 +162,12 @@ void* thread_sanitiser(void* args){
 		}
 	}
 	//=================== Post execution ===================//
+	ghe_release();
+	if_tasks_initalised[proc_id] = 0;
 	lock_acquire(&uart_lock);
 	printf("Rocket-C%x-Sani]: Completed, %d illegal accesses are detected. \r\n", hart_id, Err_Cnt);
 	lock_release(&uart_lock);
 
-	ghe_release();
-
-	if_tasks_initalised[proc_id] = 0;
 	while (or_gate(if_tasks_initalised, NUM_CORES) == 1){
 	}
 

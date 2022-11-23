@@ -74,7 +74,6 @@ void* thread_boom(void* args){
 	ght_set_status (0x02);
 
 	while (((status = ght_get_status()) < 0x1FFFF) || (ght_get_buffer_status() != GHT_EMPTY)){
-
 	}
 
 

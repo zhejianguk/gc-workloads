@@ -14,13 +14,13 @@ static inline uint64_t remapping_hart_id (uint64_t hart_id)
   uint64_t process_id;
   switch(hart_id) {
 	case 0:
-    process_id = 1;
+    process_id = 0;
     break;
 	case 1:
-    process_id = 2;
+    process_id = 1;
     break;
 	case 2:
-    process_id = 0;
+    process_id = 2;
     break;
 	default:
     process_id = hart_id;
