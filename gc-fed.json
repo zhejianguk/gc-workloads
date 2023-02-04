@@ -2,6 +2,7 @@
   "name" : "gc-fed",
   "base" : "br-base.json",
   "overlay" : "overlay",
+  "rootfs-size": "4GB",
   "host-init" : "host-init.sh",
   "guest-init" : "guest-init.sh",
   "jobs" : [
@@ -9,21 +10,6 @@
       "name" : "helloworld",
       "outputs" : [ "/root/run_result.csv" ],
       "run" : "run-workload.sh -s helloworld"
-    },
-    {
-      "name" : "helloworld_pthread",
-      "outputs" : [ "/root/run_result.csv" ],
-      "run" : "run-workload.sh -s helloworld_pthread"
-    },
-    {
-      "name" : "tc_pmc",
-      "outputs" : [ "/root/run_result.csv" ],
-      "run" : "run-workload.sh -s tc_pmc"
-    },
-    {
-      "name" : "tc_sanitiser",
-      "outputs" : [ "/root/run_result.csv" ],
-      "run" : "run-workload.sh -s tc_sanitiser"
     }
   ]
 }

@@ -1,3 +1,5 @@
 *.riscv
 *.so
 *.o
+*SPEC_CPU2006v1.2
+*.tar.gz
